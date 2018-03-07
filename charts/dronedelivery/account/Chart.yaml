@@ -1,0 +1,7 @@
+apiVersion: v1
+description: Fabrikam Drone Delivery Reference Implementation - Account service 
+name: account
+maintainers:
+    - name: accountteam
+      email:
+version: 0.1.0

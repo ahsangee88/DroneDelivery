@@ -1,0 +1,10 @@
+# Default values for dronedelivery.
+company: fabrikam
+team: accountteam
+replicaCount: 1
+correlationheader: l5d-ctx-trace 
+resources:
+  cpu: "1"
+  memory: "1G"
+servicePort: 80
+containerPort: 80
