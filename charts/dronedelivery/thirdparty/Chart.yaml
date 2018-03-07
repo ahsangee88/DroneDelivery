@@ -1,0 +1,7 @@
+apiVersion: v1
+description: Fabrikam Drone Delivery Reference Implementation - Thridparty service 
+name: thirdparty
+maintainers:
+    - name: thirdpartyteam
+      email:
+version: 0.1.0
