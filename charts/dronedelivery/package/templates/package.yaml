@@ -1,0 +1,95 @@
+#  ------------------------------------------------------------
+#   Copyright (c) Microsoft Corporation.  All rights reserved.
+#   Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+#  ------------------------------------------------------------
+
+###################################################################################################
+# Package service
+###################################################################################################
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Chart.Name }}-secrets
+type: Opaque
+data:
+  mongodb-pwd: {{ .Values.cosmosdbconnectionstring}} 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }} 
+  labels:
+    app: {{ .Chart.Name }} 
+    bc: {{ .Release.Namespace }}
+    co: {{ .Values.company }} 
+spec:
+  ports:
+  - name: http
+    port: {{.Values.servicePort}}
+    targetPort: {{.Values.containerPort}}
+  selector:
+    app: {{ .Chart.Name }}
+  clusterIP: None
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:                 # In API version apps/v1beta2, .metadata.labels no longer default to .spec.template.metadata.labels. 
+    app: {{ .Chart.Name }} 
+    version: {{ .Chart.Version }} 
+    bc: {{ .Release.Namespace }} 
+    co: {{ .Values.company }}
+spec:
+  replicas: {{ default 1 .Values.replicasCount }}
+  selector:                # In API version apps/v1beta2, .spec.selector no longer default to .spec.template.metadata.labels. 
+    matchLabels:           # spec.selector is immutable after creation of the Deployment in apps/v1beta2.
+      app: {{ .Chart.Name }}         
+  template:                # A Deployment may terminate Pods whose labels match the selector if their template is different from .spec.template
+    metadata:
+      labels:
+        app: {{ .Chart.Name }} 
+        version: {{ .Chart.Version }}
+        bc: {{ .Release.Namespace }} 
+        co: {{ .Values.company }} 
+      annotations:
+        team: {{ .Values.team }} 
+    spec:
+      containers:
+      - name: {{ .Chart.Name }} 
+        image: {{ .Values.image }} 
+        env:
+        - name: CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: package-secrets
+              key: mongodb-pwd
+        - name: COLLECTION_NAME
+          value: packages
+        - name: LOG_LEVEL
+          value: error
+        # Integration with l5d Daemon Sets
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: http_proxy
+          value: $(NODE_NAME):4140
+        - name: CORRELATION_HEADER
+          value: {{ .Values.correlationHeader }} 
+        ports:
+        - name: service
+          containerPort: {{.Values.containerPort}}
+        {{- if .Values.resources }}
+        resources:
+           requests:
+             cpu: {{ .Values.resources.cpu }}
+             memory: {{ .Values.resources.memory }}
+           limits:
+             cpu: {{ .Values.resources.cpu }}
+             memory: {{ .Values.resources.memory }}
+        {{- end }}
