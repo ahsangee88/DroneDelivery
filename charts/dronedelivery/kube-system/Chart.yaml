@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Fabrikam Drone Delivery Reference Implementation - ES-Fluentd
+name: es-fluentd
+version: 0.1.0
