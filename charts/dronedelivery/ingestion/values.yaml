@@ -1,0 +1,7 @@
+# Default values for dronedelivery.
+company: fabrikam
+team: ingestionteam
+replicaCount: 1
+correlationheader: l5d-ctx-trace 
+servicePort: 80
+containerPort: 80
