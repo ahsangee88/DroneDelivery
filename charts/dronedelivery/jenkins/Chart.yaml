@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Fabrikam Drone Delivery Reference Implementation - Jenkins 
+name: jenkins
+version: 0.1.0
