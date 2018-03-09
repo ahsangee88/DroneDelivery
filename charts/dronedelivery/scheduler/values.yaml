@@ -1,0 +1,5 @@
+# Default values for dronedelivery.
+company: fabrikam
+team: schedulerteam
+replicaCount: 1
+correlationheader: l5d-ctx-trace 
